@@ -1,0 +1,26 @@
+{
+  "canisters": {
+    "motoko-bookcamp-backend": {
+      "main": "src/motoko-bookcamp-backend/main.mo",
+      "type": "motoko"
+    },
+    "motoko-bookcamp-frontend": {
+      "dependencies": [
+        "motoko-bookcamp-backend"
+      ],
+      "source": [
+        "src/motoko-bookcamp-frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "motoko-bookcamp-frontend"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
