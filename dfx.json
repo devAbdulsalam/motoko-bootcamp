@@ -1,7 +1,19 @@
 {
   "canisters": {
     "motoko-bookcamp-backend": {
-      "main": "src/motoko-bookcamp-backend/main.mo",
+      "main": "src/motoko-bookcamp-backend/chapters/main.mo",
+      "type": "motoko"
+    },
+    "graduation_dao" : {
+      "main": "src/motoko-bookcamp-backend/dao/main.mo",
+      "type": "motoko"
+    },
+    "graduation_token": {
+      "main": "src/motoko-bookcamp-backend/token/main.mo",
+      "type": "motoko"
+    },
+    "graduation_webpage": {
+      "main": "src/motoko-bookcamp-backend/webpage/main.mo",
       "type": "motoko"
     },
     "motoko-bookcamp-frontend": {
