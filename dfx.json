@@ -4,15 +4,15 @@
       "main": "src/motoko-bookcamp-backend/chapters/main.mo",
       "type": "motoko"
     },
-    "graduation_dao" : {
+    "dao" : {
       "main": "src/motoko-bookcamp-backend/dao/main.mo",
       "type": "motoko"
     },
-    "graduation_token": {
+    "token": {
       "main": "src/motoko-bookcamp-backend/token/main.mo",
       "type": "motoko"
     },
-    "graduation_webpage": {
+    "webpage": {
       "main": "src/motoko-bookcamp-backend/webpage/main.mo",
       "type": "motoko"
     },
