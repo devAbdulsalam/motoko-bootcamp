@@ -56,9 +56,9 @@ actor DAO {
                 let mentorPrincipal = Principal.fromText("nkqop-siaaa-aaaaj-qa3qq-cai");
                 switch(members.get(mentorPrincipal)){
                         case(null){
-                                let mentor : Member = { name = "Motoko_bootcamp"; role : Role = #Mentor;};
+                                let mentor : Member = { name = "motoko_bootcamp"; role : Role = #Mentor;};
                                 members.put(mentorPrincipal, mentor);
-                                ledger.put(mentorPrincipal, 10000);
+                                ledger.put(mentorPrincipal, 1000);
                                 return #ok();
 
                         };
@@ -92,7 +92,7 @@ actor DAO {
         public query func getMember(principal : Principal) : async Result<Member, Text> {
                 switch(members.get(principal)){
                         case(null){
-                                return #err("Already a member");
+                                return #err("Member with principal " #Principal.toText(principal) # " does not exist!");
 
                         };
                         case(?member){
@@ -255,7 +255,7 @@ actor DAO {
                         };
                         case(?member){
                                 if(member.role != #Mentor or member.role != #Graduate){
-                                        return #err("Caller not a mentor or gradute,  can't vote for proposal!");
+                                        return #err("Caller not a mentor or gradute can't vote for proposal!");
                                 };
                                 switch(proposals.get(proposalId)){
                                         case(null){
