@@ -1,30 +1,30 @@
 {
   "canisters": {
-    "motoko-bookcamp-backend": {
-      "main": "src/motoko-bookcamp-backend/chapters/main.mo",
+    "motoko-bootcamp-backend": {
+      "main": "src/motoko-bootcamp-backend/chapters/main.mo",
       "type": "motoko"
     },
     "dao" : {
-      "main": "src/motoko-bookcamp-backend/dao/main.mo",
+      "main": "src/motoko-bootcamp-backend/dao/main.mo",
       "type": "motoko"
     },
     "token": {
-      "main": "src/motoko-bookcamp-backend/token/main.mo",
+      "main": "src/motoko-bootcamp-backend/token/main.mo",
       "type": "motoko"
     },
     "webpage": {
-      "main": "src/motoko-bookcamp-backend/webpage/main.mo",
+      "main": "src/motoko-bootcamp-backend/webpage/main.mo",
       "type": "motoko"
     },
-    "motoko-bookcamp-frontend": {
+    "motoko-bootcamp-frontend": {
       "dependencies": [
-        "motoko-bookcamp-backend"
+        "motoko-bootcamp-backend"
       ],
       "source": [
-        "src/motoko-bookcamp-frontend/dist"
+        "src/motoko-bootcamp-frontend/dist"
       ],
       "type": "assets",
-      "workspace": "motoko-bookcamp-frontend"
+      "workspace": "motoko-bootcamp-frontend"
     }
   },
   "defaults": {

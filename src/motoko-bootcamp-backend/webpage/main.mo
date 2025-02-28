@@ -1,4 +1,3 @@
-
 import Types "types";
 import Result "mo:base/Result";
 import Text "mo:base/Text";
@@ -13,17 +12,17 @@ actor Webpage {
 
     // The manifesto stored in the webpage canister should always be the same as the one stored in the DAO canister
     stable var manifesto : Text = "Let's graduate!";
-
     // Correct Dao canister interface
     let Dao : actor {
         getName : shared () -> async Text;
         getManifesto : shared () -> async Text;
         getGoals : shared () -> async [Text];
         getMember : shared (id: Principal) -> async Result.Result<(), Text>;
-    } = actor("cinef-v4aaa-aaaaa-qaalq-cai");
+    } = actor("zwbmv-jyaaa-aaaab-qacaa-cai");
 
-    let goals = await Dao.getGoals();
-    let name = await Dao.getName();
+
+    let goals =  Dao.getGoals();  
+    let name =  Dao.getName();
     let member = Dao.getMember(request.principal);
     // The webpage displays the manifesto
      let logo : Text = "<svg width='100%' height='100%' viewBox='0 0 238 60' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' xml:space='preserve' xmlns:serif='http://www.serif.com/' style='fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;'>

@@ -272,7 +272,7 @@ actor DAO {
                                                 let votingPower = _getVotingPower(member.role, balance);
                                                 var newExecuted : ?Time.Time = null;
                                                 let newVotes = Buffer.fromArray<Vote>(proposal.votes);
-                                                let newVoteScore = proposal.voteScore + votingPower;
+                                                let newVoteScore = _getScore(proposal.voteScore, yesOrNo, votingPower);
                                                 let newProposalStatus = _getProposalStatus(newVoteScore);
                                                  if (newProposalStatus == #Accepted) {
                                                         _executeProposal(proposal.content);

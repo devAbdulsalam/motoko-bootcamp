@@ -1,10 +1,10 @@
 {
-  "name": "motoko-bookcamp-frontend",
+  "name": "motoko-bootcamp-frontend",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "setup": "npm i && dfx canister create motoko-bookcamp-backend && dfx generate motoko-bookcamp-backend && dfx deploy",
+    "setup": "npm i && dfx canister create motoko-bootcamp-backend && dfx generate motoko-bootcamp-backend && dfx deploy",
     "start": "vite --port 3000",
     "prebuild": "dfx generate",
     "build": "tsc && vite build",

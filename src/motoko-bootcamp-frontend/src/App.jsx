@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motoko_bookcamp_backend } from 'declarations/motoko-bookcamp-backend';
+import { motoko_bootcamp_backend } from 'declarations/motoko-bootcamp-backend';
 
 function App() {
   const [greeting, setGreeting] = useState('');
@@ -7,7 +7,7 @@ function App() {
   function handleSubmit(event) {
     event.preventDefault();
     const name = event.target.elements.name.value;
-    motoko_bookcamp_backend.greet(name).then((greeting) => {
+    motoko_bootcamp_backend.greet(name).then((greeting) => {
       setGreeting(greeting);
     });
     return false;
