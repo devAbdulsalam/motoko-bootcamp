@@ -8,10 +8,8 @@ import Buffer "mo:base/Buffer";
 import Option "mo:base/Option";
 import Iter "mo:base/Iter";
 import Array "mo:base/Array";
-import Nat64 "mo:base/Nat64";
 import Types "types";
 import Time "mo:base/Time";
-import Nat32 "mo:base/Nat32";
 
 actor DAO {
         type Result<A, B> = Result.Result<A, B>;
@@ -33,7 +31,7 @@ actor DAO {
         stable var goals : [Text] = [];
         var nextProposalId : Nat = 0;
         let members = HashMap.HashMap<Principal, Member>(0, Principal.equal, Principal.hash);
-        let proposals = HashMap.HashMap<ProposalId, Proposal>(0, Nat.equal, Nat32);
+        let proposals = HashMap.HashMap<ProposalId, Proposal>(0, Nat.equal, Hash.hash);
         let ledger = HashMap.HashMap<Principal, Nat>(0, Principal.equal, Principal.hash);
 
         // Returns the name of the DAO
@@ -142,24 +140,24 @@ actor DAO {
 
                         };
                         case(?member){
-                               if(isMentor.role != #Mentor){
+                               if(member.role != #Mentor){
                                         return #err("Not Mentor, Cant create proposal!");
                                 };
                                 let balance = Option.get(ledger.get(caller), 0);
                                 if(balance < 0){
-                                                return #err("Not enough  token to create proposal!");
+                                        return #err("Not enough  token to create proposal!");
                                 };
                                 // Create the proposal and burn the token
                                 let proposal = {
                                         id = nextProposalId;
                                         content;
-                                        creator: caller;
-                                        createdTime = Time.now();
+                                        creator = caller;
+                                        created = Time.now();
                                         executed = null;
                                         votes =[];
-                                        vpteScore = 0;
+                                        voteScore = 0;
                                         status = #Open;
-                                }
+                                };
                                 proposals.put(nextProposalId, proposal);
                                 nextProposalId += 1;
                                 ledger.put(caller, balance - 1);
@@ -190,7 +188,7 @@ actor DAO {
         // Vote for the given proposal
         // Returns an error if the proposal does not exist or the member is not allowed to vote
 
-        func _checkUserVote(proposal : Proposal, member : Principal) : async Bool {
+        func _checkUserVote(proposal : Proposal, member : Principal) :  Bool {
                 return Array.find<Vote>(
                         proposal.votes,
                         func(vote : Vote){
@@ -271,9 +269,9 @@ actor DAO {
                                                         return #err("Caller already  voted on this proposal!");
                                                 };
                                                 let balance = Option.get(ledger.get(caller), 0);
-                                                let votingPower = _getVotingPower(member.role);
+                                                let votingPower = _getVotingPower(member.role, balance);
                                                 var newExecuted : ?Time.Time = null;
-                                                let newVotes = Buffer.fromArray<Vote>(proposals.votes);
+                                                let newVotes = Buffer.fromArray<Vote>(proposal.votes);
                                                 let newVoteScore = proposal.voteScore + votingPower;
                                                 let newProposalStatus = _getProposalStatus(newVoteScore);
                                                  if (newProposalStatus == #Accepted) {
@@ -281,14 +279,14 @@ actor DAO {
                                                         newExecuted := ?Time.now();
                                                 };
                                                 let newProposal = {
-                                                        id: proposal.id;
-                                                        content: proposal.content;
-                                                        creator: proposal.creator;
-                                                        created: proposal.created;
-                                                        executed: newExecuted;
+                                                        id= proposal.id;
+                                                        content= proposal.content;
+                                                        creator= proposal.creator;
+                                                        created= proposal.created;
+                                                        executed= newExecuted;
                                                         votes = Buffer.toArray(newVotes);
                                                         voteScore = newVoteScore;
-                                                        status: newProposalStatus;
+                                                        status= newProposalStatus;
                                                 };
 
                                                 proposals.put(proposalId, newProposal);
