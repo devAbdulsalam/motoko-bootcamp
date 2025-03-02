@@ -32,7 +32,15 @@ actor DAO {
         var nextProposalId : Nat = 0;
         let members = HashMap.HashMap<Principal, Member>(0, Principal.equal, Principal.hash);
         let proposals = HashMap.HashMap<ProposalId, Proposal>(0, Nat.equal, Hash.hash);
-        let ledger = HashMap.HashMap<Principal, Nat>(0, Principal.equal, Principal.hash);
+        // let ledger = HashMap.HashMap<Principal, Nat>(0, Principal.equal, Principal.hash);
+
+        type TokenCanister = actor {
+        burn: (Principal, Nat) -> async Result<(), Text>; 
+        balanceOf: (Principal) -> async Nat; // Get the token balance of a user
+        mint: (Principal, Nat) -> async Result<(), Text>; 
+        };
+        // let tokenCanister: TokenCanister = actor "bd3sg-teaaa-aaaaa-qaaba-cai"; // replace with actual principal ID
+        let tokenCanister: TokenCanister = actor "jaamb-mqaaa-aaaaj-qa3ka-cai";
 
         // Returns the name of the DAO
         public query func getName() : async Text {
@@ -58,7 +66,8 @@ actor DAO {
                         case(null){
                                 let mentor : Member = { name = "motoko_bootcamp"; role : Role = #Mentor;};
                                 members.put(mentorPrincipal, mentor);
-                                ledger.put(mentorPrincipal, 1000);
+                                // ledger.put(mentorPrincipal, 1000);
+                                let _ = await tokenCanister.mint(mentorPrincipal, 10);
                                 return #ok();
 
                         };
@@ -77,7 +86,8 @@ actor DAO {
                         case(null){
                                 let student : Member = {name: Text = member.name; role: Role = #Student};
                                 members.put(caller, student);
-                                ledger.put(caller, 10);
+                                // ledger.put(caller, 10);
+                                let _ = await tokenCanister.mint(caller, 10);
                                 return #ok();
 
                         };
@@ -105,30 +115,31 @@ actor DAO {
         // Returns an error if the student does not exist or is not a student
         // Returns an error if the caller is not a mentor
         public shared ({ caller }) func graduate(student : Principal) : async Result<(), Text> {
-                switch(members.get(student)){
-                        case(null){
-                                return #err("Student with pricipal :" #Principal.toText(student) # " not found!");
-
+                // Check if the caller is a mentor
+                switch (members.get(caller)) {
+                        case (null) {
+                        return #err("Caller is not a member");
                         };
-                        case(?oldStudent){
-                                 if(oldStudent.role != #Student){
-                                        return #err("Member with pricipal :" #Principal.toText(student) # "is not a student!");
-                                };
-                                switch(members.get(caller)){
-                                        case(null){
-                                                return #err("Not Mentor, Cant graduate student!");
-                                        };
-                                case(?isMentor){
-                                        if(isMentor.role != #Mentor){
-                                                return #err("Not Mentor, Cant graduate student!");
-                                        };
-                                        let newStudent = {name : Text = oldStudent.name; role: Role = #Graduate};
-                                        members.put(caller, newStudent);
-                                        return #ok();
-                                        };
-                                };
+                        case (?callerMember) {
+                        if (callerMember.role != #Mentor) {
+                                return #err("Caller is not a mentor");
                         };
+                        }
                 };
+
+                // Check if the student exists and is eligible for graduation
+                switch (members.get(student)) {
+                        case (null) {
+                        return #err("Student with principal " # Principal.toText(student) # " not found");
+                        };
+                        case (?studentMember) {
+                        if (studentMember.role != #Student) {
+                                return #err("Member with principal " # Principal.toText(student) # " is not a student");
+                        };
+                        members.put(student, { name = studentMember.name; role = #Graduate });
+                        return #ok();
+                        }
+                }
         };
 
         // Create a new proposal and returns its id
@@ -137,15 +148,16 @@ actor DAO {
                switch(members.get(caller)){
                         case(null){
                                 return #err("Caller is not a Member, Cannot create proposal!");
-
                         };
                         case(?member){
                                if(member.role != #Mentor){
                                         return #err("Not Mentor, Cant create proposal!");
                                 };
-                                let balance = Option.get(ledger.get(caller), 0);
+                                // let balance = Option.get(ledger.get(caller), 0);
+
+                                let balance = await tokenCanister.balanceOf(caller);
                                 if(balance < 0){
-                                        return #err("Not enough  token to create proposal!");
+                                        return #err("Not enough token to create proposal!");
                                 };
                                 // Create the proposal and burn the token
                                 let proposal = {
@@ -158,9 +170,19 @@ actor DAO {
                                         voteScore = 0;
                                         status = #Open;
                                 };
-                                proposals.put(nextProposalId, proposal);
-                                nextProposalId += 1;
-                                ledger.put(caller, balance - 1);
+                                let burnResult = await tokenCanister.burn(caller, 1);
+                                switch (burnResult) {
+                                        case(#ok(_)){
+
+                                                proposals.put(nextProposalId, proposal);
+                                                nextProposalId += 1;
+                                                return #ok(1);
+                                        };
+                                        case(#err(_)) {
+                                        return #err("Error burning tokens");
+                                        };
+                                };
+                                // ledger.put(caller, balance - 1);
                                 return #ok(nextProposalId - 1)
 
                         };
@@ -268,7 +290,8 @@ actor DAO {
                                                 if(_checkUserVote(proposal, caller)){
                                                         return #err("Caller already  voted on this proposal!");
                                                 };
-                                                let balance = Option.get(ledger.get(caller), 0);
+                                                // let balance = Option.get(ledger.get(caller), 0);
+                                                let balance = await tokenCanister.balanceOf(caller);
                                                 let votingPower = _getVotingPower(member.role, balance);
                                                 var newExecuted : ?Time.Time = null;
                                                 let newVotes = Buffer.fromArray<Vote>(proposal.votes);
