@@ -25,7 +25,7 @@ actor DAO {
 
 
         // The principal of the Webpage canister associated with this DAO canister (needs to be updated with the ID of your Webpage canister)
-        stable let canisterIdWebpage : Principal = Principal.fromText("aaaaa-aa");
+        stable let canisterIdWebpage: Principal = Principal.fromText("a3shf-5eaaa-aaaaa-qaafa-cai");
         stable var manifesto = "EduConnect is an innovative platform that connects underpriviledged students with qualified educators, mentors, sponsors and resources to help them achieve their academic goals.";
         stable let name = "Abdulsalam";
         stable var goals : [Text] = [];
@@ -62,7 +62,7 @@ actor DAO {
                                 return #ok();
 
                         };
-                        case(?oldMentor){
+                        case(?_) {
                                 return #err("Already a mentor");
                         };
                 };
@@ -81,7 +81,7 @@ actor DAO {
                                 return #ok();
 
                         };
-                        case(?oldMember){
+                        case(?_) {
                                 return #err("Already a member");
                         };
                 };
@@ -89,7 +89,7 @@ actor DAO {
 
         // Get the member with the given principal
         // Returns an error if the member does not exist
-        public query func getMember(principal : Principal) : async Result<Member, Text> {
+        public shared query func getMember(principal : Principal) : async Result<Member, Text> {
                 switch(members.get(principal)){
                         case(null){
                                 return #err("Member with principal " #Principal.toText(principal) # " does not exist!");
@@ -254,8 +254,8 @@ actor DAO {
                                 return #err("Caller not a member can't vote for proposal!");
                         };
                         case(?member){
-                                if(member.role != #Mentor or member.role != #Graduate){
-                                        return #err("Caller not a mentor or gradute can't vote for proposal!");
+                               if(member.role == #Student){
+                                        return #err("Only mentor or gradute can vote on proposal!");
                                 };
                                 switch(proposals.get(proposalId)){
                                         case(null){
